@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
         ),
       ],
               child: MaterialApp(
-          title: 'cal.club',
+          title: 'Cal Club',
           navigatorKey: NavigationService.navigatorKey,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(

@@ -282,7 +282,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen>
                   color: Colors.white,
                   size: 20,
                 ),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => Navigator.of(context).pop('refresh'),
               ),
             ),
           ),
@@ -405,7 +405,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen>
             borderRadius: BorderRadius.circular(20),
           ),
           child: Text(
-            'Meal',
+            mealDetails.mealType ?? 'Meal',
             style: TextStyle(
               color: Colors.grey[700],
               fontSize: 12,
@@ -429,7 +429,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen>
 
   Widget _buildBalanceIndicator(MealDetailsModel mealDetails) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: mealDetails.isBalanced ? const Color(0xFFE8F5E8) : const Color(0xFFF5F5DC),
         borderRadius: BorderRadius.circular(12),
@@ -442,7 +442,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen>
           Icon(
             mealDetails.isBalanced ? Icons.check_circle : Icons.info_outline,
             color: mealDetails.isBalanced ? const Color(0xFF8B7355) : Colors.grey[600],
-            size: 24,
+            size: 22,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -450,7 +450,7 @@ class _MealDetailsScreenState extends State<MealDetailsScreen>
               mealDetails.balanceMessage, // Use real message from API
               style: TextStyle(
                 color: mealDetails.isBalanced ? const Color(0xFF8B7355) : Colors.grey[700],
-                fontSize: 12,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -483,26 +483,26 @@ class _MealDetailsScreenState extends State<MealDetailsScreen>
           childAspectRatio: 2.25, // Decreased to give more height to each card
           children: [
             NutritionalSummaryCard(
-              icon: Icons.local_fire_department,
+              icon: Icons.local_fire_department_rounded,
               iconColor: Colors.orange, // Keep orange flame
               value: '${mealDetails.nutritionalSummary.totalCalories.round()} kcal',
               label: 'Calories',
             ),
             NutritionalSummaryCard(
-              icon: Icons.flash_on,
-              iconColor: Colors.blue, // Keep blue lightning
+              icon: Icons.bolt,
+              iconColor: Colors.red, // Keep blue lightning
               value: '${mealDetails.nutritionalSummary.totalProtein.round()}g',
               label: 'Protein',
             ),
             NutritionalSummaryCard(
               icon: Icons.grain,
-              iconColor: Colors.green, // Keep green wheat
+              iconColor: Colors.brown, // Keep green wheat
               value: '${mealDetails.nutritionalSummary.totalCarbs.round()}g',
               label: 'Carbs',
             ),
             NutritionalSummaryCard(
-              icon: Icons.water_drop,
-              iconColor: Colors.red, // Keep red water drops
+              icon: Icons.water_drop_outlined,
+              iconColor: Colors.blue, // Keep red water drops
               value: '${mealDetails.nutritionalSummary.totalFat.round()}g',
               label: 'Fat',
             ),

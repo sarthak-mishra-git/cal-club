@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 class MealDetailsModel extends Equatable {
   final String id;
   final String name;
+  final String? mealType;
   final String imageUrl;
   final NutritionalSummary nutritionalSummary;
   final List<IngredientItem> ingredients;
@@ -13,6 +14,7 @@ class MealDetailsModel extends Equatable {
   const MealDetailsModel({
     required this.id,
     required this.name,
+    this.mealType,
     required this.imageUrl,
     required this.nutritionalSummary,
     required this.ingredients,
@@ -25,6 +27,7 @@ class MealDetailsModel extends Equatable {
     return MealDetailsModel(
       id: json['mealId'] ?? json['id'] ?? '',
       name: json['mealName'] ?? json['name'] ?? '',
+      mealType: json['mealType'] ?? '',
       imageUrl: json['imagePath'] ?? json['imageUrl'] ?? '',
       nutritionalSummary: NutritionalSummary.fromJson(json['nutritionalSummary'] ?? {}),
       ingredients: (json['ingredients'] as List<dynamic>?)

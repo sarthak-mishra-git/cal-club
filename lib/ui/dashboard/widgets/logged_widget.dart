@@ -4,6 +4,8 @@ import '../../../models/widgets/logged_widget_data.dart';
 import '../../../models/widgets/log_entry_data.dart';
 import '../../meal_details/screens/meal_details_screen.dart';
 import '../../../blocs/food_analysis/food_analysis_bloc.dart';
+import '../../../blocs/dashboard/dashboard_bloc.dart';
+import '../../../blocs/dashboard/dashboard_event.dart';
 
 class LoggedWidget extends StatelessWidget {
   final LoggedWidgetData loggedData;
@@ -272,8 +274,8 @@ class LoggedWidget extends StatelessWidget {
     );
   }
 
-  void _onMealTap(BuildContext context, String mealId) {
-    Navigator.of(context).push(
+  void _onMealTap(BuildContext context, String mealId) async {
+    final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => BlocProvider(
           create: (context) => FoodAnalysisBloc(),
@@ -281,5 +283,10 @@ class LoggedWidget extends StatelessWidget {
         ),
       ),
     );
+    
+    // Refresh dashboard data if returning from meal details
+    if (result == 'refresh' && context.mounted) {
+      context.read<DashboardBloc>().add(FetchDashboardData());
+    }
   }
 } 

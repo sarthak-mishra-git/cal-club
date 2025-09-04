@@ -97,7 +97,7 @@ class SummaryCarouselCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.local_fire_department, size: 18, color: kAccentColor),
+                      const Icon(Icons.local_fire_department_rounded, size: 18, color: kAccentColor),
                       const SizedBox(width: 6),
                       const Text('Exercise', style: TextStyle(fontSize: 13, color: Colors.black87)),
                       const Spacer(),

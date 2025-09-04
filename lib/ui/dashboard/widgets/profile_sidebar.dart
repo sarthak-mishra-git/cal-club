@@ -160,7 +160,7 @@ class ProfileSidebar extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'cal.club v1.0.0',
+              'Cal Club v1.0.0',
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 12,

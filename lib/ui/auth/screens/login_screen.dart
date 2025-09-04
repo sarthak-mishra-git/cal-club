@@ -81,7 +81,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         
                         // App Title
                         Text(
-                          'cal.club',
+                          'Cal Club',
                           style: TextStyle(
                             fontSize: 32,
                             fontWeight: FontWeight.bold,

@@ -29,7 +29,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             children: [
               const SizedBox(width: 8),
               Text(
-                appBarData?.title ?? 'cal.club',
+                appBarData?.title ?? 'Cal Club',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 24,
@@ -55,10 +55,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      CupertinoIcons.flame_fill,
-                      color: Colors.orange,
-                      size: 18,
+                    Image.asset(
+                      'assets/images/calorie_icon.png', // Replace with the correct path to your asset
+                      width: 20,
+                      height: 20,
                     ),
                     const SizedBox(width: 4),
                     Text(
