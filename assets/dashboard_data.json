@@ -1,0 +1,148 @@
+{
+    "appBarData": {
+        "title": "TrackAI",
+        "icon": "fire",
+        "caloriesBurnt": 12
+    },
+    "weekViewData": {
+        "days": [
+            {
+                "dayLetter": "M",
+                "date": 2,
+                "isSelected": false
+            },
+            {
+                "dayLetter": "T",
+                "date": 3,
+                "isSelected": false
+            },
+            {
+                "dayLetter": "W",
+                "date": 4,
+                "isSelected": false
+            },
+            {
+                "dayLetter": "T",
+                "date": 5,
+                "isSelected": true
+            },
+            {
+                "dayLetter": "F",
+                "date": 6,
+                "isSelected": false
+            },
+            {
+                "dayLetter": "S",
+                "date": 7,
+                "isSelected": false
+            },
+            {
+                "dayLetter": "S",
+                "date": 8,
+                "isSelected": false
+            }
+        ]
+    },
+    "showFloatingActionButton": true,
+    "widgets": [
+        {
+            "widgetType": "macro_widget",
+            "widgetData": {
+                "primary_card": {
+                    "icon": "fire",
+                    "color": "black",
+                    "text": "Calories left",
+                    "value": 1200,
+                    "completed": 300,
+                    "target": 1500
+                },
+                "secondary_cards": [
+                    {
+                        "icon": "lightning",
+                        "color": "red",
+                        "text": "Protein",
+                        "value": 30,
+                        "completed": 70,
+                        "target": 100
+                    },
+                    {
+                        "icon": "wheat",
+                        "color": "brown",
+                        "text": "Carbs",
+                        "value": 30,
+                        "completed": 120,
+                        "target": 150
+                    },
+                    {
+                        "icon": "water",
+                        "color": "blue",
+                        "text": "Fats",
+                        "value": 30,
+                        "completed": 45,
+                        "target": 75
+                    }
+                ]
+            }
+        },
+        {
+            "widgetType": "logged_widget",
+            "widgetData": {
+                "title": "Today's Logs",
+                "subtitle": "Here's what you have logged today",
+                "logs": [
+                    {
+                        "dish_image": "",
+                        "dish_name": "Grilled Chicken Salad",
+                        "time": "12:30pm",
+                        "calories": 350,
+                        "protein": 25,
+                        "carbs": 15,
+                        "fat": 12
+                    },
+                    {
+                        "dish_image": "",
+                        "dish_name": "Quinoa Bowl",
+                        "time": "3:45pm",
+                        "calories": 420,
+                        "protein": 18,
+                        "carbs": 45,
+                        "fat": 8
+                    },
+                    {
+                        "dish_image": "",
+                        "dish_name": "Salmon with Vegetables",
+                        "time": "7:15pm",
+                        "calories": 380,
+                        "protein": 32,
+                        "carbs": 20,
+                        "fat": 15
+                    }
+                ],
+                "zero_state": {
+                    "image": "",
+                    "text": "You have no logs yet"
+                }
+            }
+        }
+    ],
+    "footerData": [
+        {
+            "active": true,
+            "icon": "home",
+            "title": "Home",
+            "action": "navigate_home"
+        },
+        {
+            "active": false,
+            "icon": "progress",
+            "title": "Progress",
+            "action": "navigate_progress"
+        },
+        {
+            "active": false,
+            "icon": "settings",
+            "title": "Settings",
+            "action": "navigate_settings"
+        }
+    ]
+}

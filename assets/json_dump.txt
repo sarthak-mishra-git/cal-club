@@ -1,0 +1,35 @@
+{
+            "widgetType": "summary_carousel",
+            "widgetData": {
+                "cards": [
+                    {
+                        "remaining": 1000,
+                        "goal": 1500,
+                        "food": 500,
+                        "exercise": 0
+                    },
+                    {
+                        "remaining": 800,
+                        "goal": 1600,
+                        "food": 600,
+                        "exercise": 200
+                    }
+                ]
+            }
+        },
+        {
+            "widgetType": "metric_card",
+            "widgetData": {
+                "title": "Steps",
+                "value": 3550,
+                "goal": 15000
+            }
+        },
+        {
+            "widgetType": "metric_card",
+            "widgetData": {
+                "title": "Exercise",
+                "value": 10,
+                "unit": "cal"
+            }
+        }
