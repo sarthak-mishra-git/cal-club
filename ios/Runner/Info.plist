@@ -45,5 +45,15 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	
+	<!-- Privacy Usage Descriptions -->
+	<key>NSCameraUsageDescription</key>
+	<string>Cal Club needs access to your camera to take photos of your food for calorie tracking and analysis.</string>
+	
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Cal Club needs access to your photo library to select food images for calorie analysis.</string>
+	
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Cal Club may need microphone access for camera functionality when recording videos.</string>
 </dict>
 </plist>
