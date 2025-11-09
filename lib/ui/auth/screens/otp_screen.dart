@@ -98,7 +98,7 @@ class _OtpScreenState extends State<OtpScreen> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -137,7 +137,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         Icon(
                           Icons.phone_android,
                           size: 80,
-                          color: const Color(0xFF8B7355), // Dark beige
+                          color: Colors.black, // Dark beige
                         ),
                         const SizedBox(height: 24),
                         
@@ -192,7 +192,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(12),
-                                    borderSide: BorderSide(color: const Color(0xFF8B7355)), // Dark beige
+                                    borderSide: BorderSide(color: Colors.black), // Dark beige
                                   ),
                                 ),
                                 onChanged: (value) => _onOtpChanged(value, index),
@@ -221,7 +221,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _verifyOtp,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF8B7355), // Dark beige
+                              backgroundColor: Colors.black, // Dark beige
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -258,7 +258,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           child: Text(
                             'Resend OTP',
                             style: TextStyle(
-                              color: const Color(0xFF8B7355), // Dark beige
+                              color: Colors.black, // Dark beige
                               fontSize: 16,
                             ),
                           ),

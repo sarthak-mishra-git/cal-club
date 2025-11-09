@@ -7,9 +7,10 @@ import 'package:cal_track/ui/dashboard/dashboard_widget_builder.dart';
 import 'package:cal_track/ui/dashboard/widgets/custom_app_bar.dart';
 import 'package:cal_track/ui/dashboard/widgets/week_view_widget.dart';
 import 'package:cal_track/ui/dashboard/widgets/footer_widget.dart';
-import 'package:cal_track/ui/dashboard/widgets/image_source_dialog.dart';
-import 'package:cal_track/ui/dashboard/widgets/profile_sidebar.dart';
+import 'package:cal_track/ui/dashboard/widgets/calories_popup.dart';
+import 'package:cal_track/ui/dashboard/widgets/day_selector_widget.dart';
 import 'package:cal_track/ui/dashboard/screens/camera_screen.dart';
+import 'package:cal_track/models/widgets/day_selector_data.dart';
 import 'package:cal_track/services/image_service.dart';
 import 'package:cal_track/services/image_upload_service.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,10 +21,16 @@ import 'package:cal_track/blocs/food_analysis/food_analysis_event.dart';
 import 'package:cal_track/blocs/auth/auth_bloc.dart';
 import 'package:cal_track/blocs/auth/auth_state.dart';
 import 'package:cal_track/blocs/auth/auth_event.dart';
+import 'package:cal_track/services/mock_data_service.dart';
+import 'package:cal_track/models/screens/dashboard_screen_model.dart';
+import 'package:cal_track/models/widgets/app_bar_data.dart';
+import 'package:cal_track/models/widgets/week_view_data.dart';
+import 'package:cal_track/models/widgets/footer_data.dart';
 import 'package:cal_track/network/food_analysis_repository.dart';
 import 'package:cal_track/network/token_storage.dart';
 import 'package:cal_track/ui/meal_details/screens/meal_details_screen.dart';
 import 'package:cal_track/models/meal_details/meal_details_model.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -33,20 +40,88 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
+  String? _selectedDate; // Track selected date for guest mode
+
   @override
   void initState() {
     super.initState();
+    // Initialize selected date to today
+    final now = DateTime.now();
+    _selectedDate = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
     context.read<DashboardBloc>().add(FetchDashboardData());
   }
 
   void _handleDayTap(int dayIndex) {
     print('Day $dayIndex tapped');
-    
-    // Get the selected date and fetch data for that date
+
+    // Check if user is in guest mode
+    final authState = context.read<AuthBloc>().state;
     final selectedDate = _getDateForDayIndex(dayIndex);
+    
+    if (authState is GuestAuthenticated) {
+      // In guest mode, update the selected date and rebuild
+      print('Guest mode: Day selection updated for date $selectedDate');
+      setState(() {
+        _selectedDate = selectedDate;
+      });
+      return;
+    }
+
+    // For authenticated users, get the selected date and fetch data for that date
+    setState(() {
+      _selectedDate = selectedDate;
+    });
     context.read<DashboardBloc>().add(FetchDashboardData(date: selectedDate));
   }
-  
+
+  void _handlePrevDay() {
+    // Get the current day selector data from state
+    final dashboardState = context.read<DashboardBloc>().state;
+    if (dashboardState is! DashboardLoaded) return;
+    
+    final currentDate = DateTime.parse(dashboardState.daySelectorData.date);
+    final prevDate = currentDate.subtract(const Duration(days: 1));
+    final prevDateString = '${prevDate.year}-${prevDate.month.toString().padLeft(2, '0')}-${prevDate.day.toString().padLeft(2, '0')}';
+    
+    // Check if user is in guest mode
+    final authState = context.read<AuthBloc>().state;
+    if (authState is GuestAuthenticated) {
+      setState(() {
+        _selectedDate = prevDateString;
+      });
+      return;
+    }
+    
+    setState(() {
+      _selectedDate = prevDateString;
+    });
+    context.read<DashboardBloc>().add(FetchDashboardData(date: prevDateString));
+  }
+
+  void _handleNextDay() {
+    // Get the current day selector data from state
+    final dashboardState = context.read<DashboardBloc>().state;
+    if (dashboardState is! DashboardLoaded) return;
+    
+    final currentDate = DateTime.parse(dashboardState.daySelectorData.date);
+    final nextDate = currentDate.add(const Duration(days: 1));
+    final nextDateString = '${nextDate.year}-${nextDate.month.toString().padLeft(2, '0')}-${nextDate.day.toString().padLeft(2, '0')}';
+    
+    // Check if user is in guest mode
+    final authState = context.read<AuthBloc>().state;
+    if (authState is GuestAuthenticated) {
+      setState(() {
+        _selectedDate = nextDateString;
+      });
+      return;
+    }
+    
+    setState(() {
+      _selectedDate = nextDateString;
+    });
+    context.read<DashboardBloc>().add(FetchDashboardData(date: nextDateString));
+  }
+
   String _getDateForDayIndex(int dayIndex) {
     final now = DateTime.now();
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
@@ -56,96 +131,139 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _handleCaloriesTap() {
     print('Calories tapped');
-    // TODO: Handle calories tap
+    // Check if user is in guest mode
+    final authState = context.read<AuthBloc>().state;
+    if (authState is GuestAuthenticated) {
+      _showGuestModeDialog();
+      return;
+    }
+
+    _showCaloriesPopup();
+  }
+
+  void _handleStreakTap() {
+    print('streak tapped');
+
+    // Check if user is in guest mode
+    final authState = context.read<AuthBloc>().state;
+    if (authState is GuestAuthenticated) {
+      _showGuestModeDialog();
+      return;
+    }
+  }
+
+  void _showGuestModeDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Guest Mode'),
+        content: const Text(
+          'Apple Health integration is not available in guest mode. Please create an account to access your health data.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCaloriesPopup() {
+    final dashboardState = context.read<DashboardBloc>().state;
+    if (dashboardState is DashboardLoaded) {
+      final selectedDate = _selectedDate != null
+          ? DateTime.parse(_selectedDate!)
+          : DateTime.now();
+
+      showDialog(
+        context: context,
+        builder: (context) => CaloriesPopup(
+          healthData: dashboardState.healthData,
+          selectedDate: selectedDate,
+          onConnectHealth: () {
+            Navigator.of(context).pop();
+            context.read<DashboardBloc>().add(const ConnectToAppleHealth());
+          },
+          onRefresh: () {
+            Navigator.of(context).pop();
+            final dateString = '${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}-${selectedDate.day.toString().padLeft(2, '0')}';
+            context.read<DashboardBloc>().add(FetchHealthData(date: dateString));
+          },
+        ),
+      );
+    }
   }
 
   void _showProfileSidebar(BuildContext context) {
-    showGeneralDialog(
-      context: context,
-      barrierDismissible: true,
-      barrierLabel: '',
-      barrierColor: Colors.black54,
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (context, animation, secondaryAnimation) {
-        return Align(
-          alignment: Alignment.centerLeft,
-          child: Container(
-            width: MediaQuery.of(context).size.width * 0.75,
-            height: double.infinity,
-            color: Colors.transparent,
-            child: const ProfileSidebar(),
-          ),
-        );
-      },
-      transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(-1.0, 0.0),
-            end: Offset.zero,
-          ).animate(CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeInOut,
-          )),
-          child: child,
-        );
-      },
-    );
+    Navigator.pushNamed(context, '/profile');
   }
-  
+
   // Mock method removed - we'll use real API data instead
 
   Future<void> _showImageSourceDialog(BuildContext context) async {
-    final result = await showModalBottomSheet<String>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (BuildContext context) {
-        return const ImageSourceDialog();
-      },
+    // Check if user is in guest mode
+    final authState = context.read<AuthBloc>().state;
+    if (authState is GuestAuthenticated) {
+      _showLoginRequiredDialog(context);
+      return;
+    }
+
+    // Check camera permission before navigating to camera screen
+    final hasPermission = await CameraScreen.hasCameraPermission();
+    if (!hasPermission) {
+      final granted = await CameraScreen.requestCameraPermission();
+      if (!granted) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Camera permission is required to take photos'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    // Navigate to camera screen
+    final result = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const CameraScreen(),
+      ),
     );
 
     if (result != null && mounted) {
-      await _handleImageSourceSelection(result);
+      await _processImageResult(result);
     }
   }
 
-  Future<void> _handleImageSourceSelection(String source) async {
-    try {
-      if (source == 'camera') {
-        // Navigate to camera screen for photo capture
-        final result = await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => const CameraScreen(),
-          ),
+  void _showLoginRequiredDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Login Required'),
+          content: const Text('Please login to continue'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                context.read<AuthBloc>().add(ExitGuestMode());
+              },
+              child: const Text('Login'),
+            ),
+          ],
         );
-
-        if (result != null && mounted) {
-          _processImageResult(result);
-        }
-      } else if (source == 'gallery') {
-        // Handle gallery selection
-        final result = await ImagePicker().pickImage(
-          source: ImageSource.gallery,
-          maxWidth: 1920,
-          maxHeight: 1080,
-          imageQuality: 85,
-        );
-
-        if (result != null && mounted) {
-          _processImageResult({'imagePath': result.path});
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
+      },
+    );
   }
+
 
   Future<void> _processImageResult(Map<String, dynamic> result) async {
     try {
@@ -157,9 +275,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: CircularProgressIndicator(),
         ),
       );
-      
+
       String? imageUrl;
-      
+
       // Handle different result types
       if (result['imagePath'] != null) {
         // File path from gallery
@@ -169,10 +287,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
         // Bytes from camera
         imageUrl = await ImageUploadService.uploadImageBytes(result['imageBytes']);
       }
-      
+
       // Close loading dialog
       Navigator.of(context).pop();
-      
+
       if (imageUrl != null && imageUrl.isNotEmpty) {
         // Navigate to meal details screen - FoodAnalysisBloc will handle the data
         final result = await Navigator.of(context).push(
@@ -185,7 +303,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
           ),
         );
-        
+
         // Refresh dashboard data if returning from meal details
         if (result == 'refresh') {
           context.read<DashboardBloc>().add(FetchDashboardData());
@@ -206,7 +324,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (Navigator.of(context).canPop()) {
         Navigator.of(context).pop();
       }
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -232,92 +350,155 @@ class _DashboardScreenState extends State<DashboardScreen> {
           }
         },
         child: Scaffold(
-          backgroundColor: Colors.black,
-          // drawer: const ProfileSidebar(),
-          body: BlocBuilder<DashboardBloc, DashboardState>(
-            builder: (context, state) {
-              if (state is DashboardLoading) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (state is DashboardLoaded) {
-                return Stack(
-                  children: [
-                    Column(
-                      children: [
-                        // Fixed header with app bar and week view
-                        CustomAppBar(
-                          appBarData: state.appBarData,
-                          onCaloriesTap: _handleCaloriesTap,
-                          onProfileTap: () => _showProfileSidebar(context),
-                        ),
-                        WeekViewWidget(
-                          weekViewData: state.weekViewData,
-                          onDayTap: _handleDayTap,
-                        ),
-                        // Scrollable content below
-                        Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.only(top: 8),
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30),
-                              ),
-                            ),
-                            child: ListView.builder(
-                              padding: const EdgeInsets.only(bottom: 100),
-                              itemCount: state.widgets.length,
-                              itemBuilder: (context, index) {
-                                final widgetConfig = state.widgets[index];
-                                return DashboardWidgetBuilder(
-                                  widgetType: widgetConfig.widgetType,
-                                  widgetData: widgetConfig.widgetData,
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    // Footer positioned above the content
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      child: FooterWidget(
-                        footerItems: state.footerData,
-                        onTap: NavigationUtils.handleFooterNavigation,
-                      ),
-                    ),
-                    // Floating Action Button positioned above footer
-                    if (state.showFloatingActionButton)
-                      Positioned(
-                        bottom: 80,
-                        right: 20,
-                        child: FloatingActionButton(
-                          onPressed: () async {
-                            print('FAB tapped - Upload picture');
-                            await _showImageSourceDialog(context);
-                          },
-                          backgroundColor: Colors.black,
-                          foregroundColor: Colors.white,
-                          shape: const CircleBorder(),
-                          child: const Icon(
-                            Icons.add,
-                            size: 30,
-                          ),
-                        ),
-                      ),
+          // backgroundColor: Colors.black,
+            body: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF000000),
+                    Color(0xFF222222),
+                    Color(0xFF777777),
                   ],
+                  stops: [0.0, 0.2349, 0.7728],
+                ),
+              ),
+              child: BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, authState) {
+              // Check if user is in guest mode and use mock data
+              if (authState is GuestAuthenticated) {
+                final mockData = MockDataService.getGuestDashboardData(date: _selectedDate);
+                return _buildDashboardContent(
+                  mockData.appBarData,
+                  mockData.weekViewData,
+                  mockData.daySelectorData,
+                  mockData.widgets,
+                  mockData.footerData,
+                  mockData.showFloatingActionButton,
+                  null, // No health data for guest mode
                 );
-              } else if (state is DashboardError) {
-                return Center(child: Text(state.message));
               }
-              return const SizedBox.shrink();
+
+              // For authenticated users, use the normal dashboard bloc
+              return BlocBuilder<DashboardBloc, DashboardState>(
+                builder: (context, state) {
+                  if (state is DashboardLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (state is DashboardLoaded) {
+                    return _buildDashboardContent(
+                      state.appBarData,
+                      state.weekViewData,
+                      state.daySelectorData,
+                      state.widgets,
+                      state.footerData,
+                      state.showFloatingActionButton,
+                      state.healthData != null ? {
+                        'totalCalories': state.healthData!.totalCalories,
+                        'activeCalories': state.healthData!.activeCalories,
+                        'basalCalories': state.healthData!.basalCalories,
+                      } : null,
+                    );
+                  } else if (state is DashboardError) {
+                    return Center(child: Text(state.message));
+                  }
+                  return const SizedBox.shrink();
+                },
+              );
             },
           ),
+        )
         ),
       ),
+    );
+  }
+
+  Widget _buildDashboardContent(
+    AppBarData appBarData,
+    WeekViewData weekViewData,
+    DaySelectorData daySelectorData,
+    List<DashboardWidgetConfig> widgets,
+    List<FooterItemData> footerData,
+    bool showFloatingActionButton,
+    Map<String, dynamic>? healthData,
+  ) {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            // Fixed header with app bar and week view
+            CustomAppBar(
+              appBarData: appBarData,
+              onStreakTap: _handleStreakTap,
+              onProfileTap: () => _showProfileSidebar(context),
+            ),
+            WeekViewWidget(
+              weekViewData: weekViewData,
+              onDayTap: _handleDayTap,
+            ),
+            DaySelectorWidget(
+              daySelectorData: daySelectorData,
+              onPrevTap: _handlePrevDay,
+              onNextTap: _handleNextDay,
+            ),
+            // Scrollable content below
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.only(top: 8),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
+                  ),
+                ),
+                child: ListView.builder(
+                  padding: const EdgeInsets.only(bottom: 100),
+                  itemCount: widgets.length,
+                  itemBuilder: (context, index) {
+                    final widgetConfig = widgets[index];
+                    return DashboardWidgetBuilder(
+                      widgetType: widgetConfig.widgetType,
+                      widgetData: widgetConfig.widgetData,
+                      healthData: healthData,
+                      onCalorieTap: _handleCaloriesTap
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+        // Footer positioned above the content
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: FooterWidget(
+            footerItems: footerData,
+            onTap: NavigationUtils.handleFooterNavigation,
+          ),
+        ),
+        // Floating Action Button positioned above footer
+        if (showFloatingActionButton)
+          Positioned(
+            bottom: 80,
+            right: 20,
+            child: FloatingActionButton(
+              onPressed: () async {
+                print('FAB tapped - Upload picture');
+                await _showImageSourceDialog(context);
+              },
+              backgroundColor: Colors.black,
+              foregroundColor: Colors.white,
+              shape: const CircleBorder(),
+              child: const Icon(
+                Icons.add,
+                size: 30,
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

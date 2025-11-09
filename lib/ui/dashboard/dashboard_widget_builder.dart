@@ -11,11 +11,15 @@ import 'widgets/logged_widget.dart';
 class DashboardWidgetBuilder extends StatelessWidget {
   final String widgetType;
   final Map<String, dynamic> widgetData;
+  final Map<String, dynamic>? healthData;
+  final VoidCallback? onCalorieTap;
 
   const DashboardWidgetBuilder({
     super.key,
     required this.widgetType,
     required this.widgetData,
+    this.healthData,
+    this.onCalorieTap,
   });
 
   @override
@@ -29,7 +33,11 @@ class DashboardWidgetBuilder extends StatelessWidget {
         return MetricCard(card: card);
       case 'macro_widget':
         final macroData = MacroWidgetData.fromJson(widgetData);
-        return MacroWidget(macroData: macroData);
+        return MacroWidget(
+          macroData: macroData,
+          onCalorieTap: onCalorieTap,
+          healthData: healthData,
+        );
       case 'logged_widget':
         final loggedData = LoggedWidgetData.fromJson(widgetData);
         return LoggedWidget(loggedData: loggedData);

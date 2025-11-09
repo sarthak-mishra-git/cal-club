@@ -152,7 +152,7 @@ class IngredientItem extends Equatable {
       calories: (json['calories'] ?? 0).toDouble(),
       protein: (json['protein'] ?? 0).toDouble(),
       carbs: (json['carbs'] ?? 0).toDouble(),
-      fat: (json['fat'] ?? 0).toDouble(),
+      fat: (json['fats'] ?? 0).toDouble(),
       imageUrl: json['imageUrl'] ?? '',
     );
   }

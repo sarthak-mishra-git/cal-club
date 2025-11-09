@@ -55,5 +55,23 @@
 	
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Cal Club may need microphone access for camera functionality when recording videos.</string>
+	
+	<!-- Apple Health Integration -->
+	<key>NSHealthShareUsageDescription</key>
+	<string>Cal Club needs access to your health data to track daily calories burned from your Apple Watch and provide personalized fitness insights.</string>
+	
+	<key>NSHealthUpdateUsageDescription</key>
+	<string>Cal Club can write health data to help you track your fitness progress and maintain a comprehensive health record.</string>
+	
+	<!-- Notification Permission -->
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>Cal Club needs notification permission to send you meal reminders and help you stay on track with your goals.</string>
+	
+	<!-- URL Launcher Configuration -->
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+		<string>http</string>
+	</array>
 </dict>
 </plist>

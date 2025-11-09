@@ -3,9 +3,10 @@ import 'package:http/http.dart' as http;
 import '../models/screens/dashboard_screen_model.dart';
 import '../utils/network_logger.dart';
 import '../network/token_storage.dart';
+import '../network/api_client.dart';
 
 class DashboardRepository {
-  static const String _baseUrl = 'https://cal-club.onrender.com';
+  static const String _baseUrl = 'https://calclub.onrender.com';
 
   Future<DashboardScreenModel> fetchDashboardScreenModel({String? date}) async {
     try {
@@ -30,6 +31,11 @@ class DashboardRepository {
       final response = await http.get(url, headers: headers);
       
       NetworkLogger.logResponse('GET', url.toString(), response.statusCode, response.body);
+
+      if (ApiClient.isUnauthorizedError(response.statusCode)) {
+        await ApiClient.handleUnauthorizedError();
+        throw Exception('Failed to fetch dashboard data: ${response.statusCode}');
+      }
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);

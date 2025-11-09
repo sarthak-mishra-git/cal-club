@@ -1,10 +1,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../services/navigation_service.dart';
 import '../utils/network_logger.dart';
+import '../network/token_storage.dart';
+import '../blocs/auth/auth_bloc.dart';
+import '../blocs/auth/auth_event.dart';
 
 class ApiClient {
-  static const String _baseUrl = 'https://cal-club.onrender.com';
+  static const String _baseUrl = 'https://calclub.onrender.com';
 
   static Future<http.Response> get(
     String endpoint, {
@@ -28,7 +32,7 @@ class ApiClient {
       NetworkLogger.logResponse('GET', url.toString(), response.statusCode, response.body);
       
       if (_isAuthError(response.statusCode)) {
-        NavigationService.navigateToLogin();
+        await _handleUnauthorizedError();
       }
       
       return response;
@@ -66,7 +70,7 @@ class ApiClient {
       NetworkLogger.logResponse('POST', url.toString(), response.statusCode, response.body);
       
       if (_isAuthError(response.statusCode)) {
-        NavigationService.navigateToLogin();
+        await _handleUnauthorizedError();
       }
       
       return response;
@@ -104,7 +108,7 @@ class ApiClient {
       NetworkLogger.logResponse('PUT', url.toString(), response.statusCode, response.body);
       
       if (_isAuthError(response.statusCode)) {
-        NavigationService.navigateToLogin();
+        await _handleUnauthorizedError();
       }
       
       return response;
@@ -136,7 +140,7 @@ class ApiClient {
       NetworkLogger.logResponse('DELETE', url.toString(), response.statusCode, response.body);
       
       if (_isAuthError(response.statusCode)) {
-        NavigationService.navigateToLogin();
+        await _handleUnauthorizedError();
       }
       
       return response;
@@ -147,6 +151,28 @@ class ApiClient {
   }
 
   static bool _isAuthError(int statusCode) {
-    return statusCode == 401 || statusCode == 403 || statusCode == 404;
+    return isUnauthorizedError(statusCode);
+  }
+
+  static Future<void> _handleUnauthorizedError() async {
+    await handleUnauthorizedError();
+  }
+
+  static Future<void> handleUnauthorizedError() async {
+    // Clear the token from storage
+    await TokenStorage.clearAuthData();
+    
+    // Try to dispatch logout event to AuthBloc
+    final context = NavigationService.navigatorKey.currentContext;
+    if (context != null) {
+      context.read<AuthBloc>().add(LogoutRequested());
+    } else {
+      // If context is not available, just navigate to login
+      NavigationService.navigateToLogin();
+    }
+  }
+
+  static bool isUnauthorizedError(int statusCode) {
+    return statusCode == 401 || statusCode == 403;
   }
 } 

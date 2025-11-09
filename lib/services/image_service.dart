@@ -6,10 +6,10 @@ class ImageService {
 
   static Future<Map<String, dynamic>?> pickImageFromGallery() async {
     try {
-      // Request storage permission
-      final status = await Permission.storage.request();
+      // Request photo library permission
+      final status = await Permission.photos.request();
       if (status != PermissionStatus.granted) {
-        throw Exception('Storage permission is required');
+        throw Exception('Photo library permission is required');
       }
 
       final XFile? image = await _picker.pickImage(

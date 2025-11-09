@@ -14,6 +14,7 @@ class FoodAnalysisBloc extends Bloc<FoodAnalysisEvent, FoodAnalysisState> {
     on<AnalyzeFoodImage>(_onAnalyzeFoodImage);
     on<UpdateIngredientQuantity>(_onUpdateIngredientQuantity);
     on<FetchMealDetails>(_onFetchMealDetails);
+    on<BulkEditIngredients>(_onBulkEditIngredients);
   }
 
   Future<void> _onAnalyzeFoodImage(
@@ -83,6 +84,32 @@ class FoodAnalysisBloc extends Bloc<FoodAnalysisEvent, FoodAnalysisState> {
       emit(FoodAnalysisLoaded(mealDetails: mealDetails));
     } catch (e) {
       emit(FoodAnalysisError(message: 'Failed to fetch meal details: $e'));
+    }
+  }
+
+  Future<void> _onBulkEditIngredients(
+    BulkEditIngredients event,
+    Emitter<FoodAnalysisState> emit,
+  ) async {
+    emit(FoodAnalysisUpdating());
+    
+    try {
+      // Get the stored token
+      final token = await TokenStorage.getToken();
+      if (token == null) {
+        emit(FoodAnalysisError(message: 'No authentication token found'));
+        return;
+      }
+      
+      final updatedMealDetails = await _repository.bulkEditIngredients(
+        mealId: event.mealId,
+        items: event.items,
+        token: token,
+      );
+      
+      emit(FoodAnalysisUpdated(mealDetails: updatedMealDetails));
+    } catch (e) {
+      emit(FoodAnalysisError(message: 'Failed to bulk edit ingredients: $e'));
     }
   }
 } 

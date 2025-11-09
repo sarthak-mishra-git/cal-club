@@ -40,4 +40,17 @@ class FetchMealDetails extends FoodAnalysisEvent {
 
   @override
   List<Object?> get props => [mealId];
+}
+
+class BulkEditIngredients extends FoodAnalysisEvent {
+  final String mealId;
+  final List<Map<String, dynamic>> items;
+
+  const BulkEditIngredients({
+    required this.mealId,
+    required this.items,
+  });
+
+  @override
+  List<Object?> get props => [mealId, items];
 } 

@@ -8,6 +8,7 @@ class TokenStorage {
   static const String _tokenKey = 'auth_token';
   static const String _userKey = 'auth_user';
   static const String _phoneNumberKey = 'auth_phone_number';
+  static const String _onboardingCompletedKey = 'onboarding_completed';
 
   static Future<void> storeToken(String token) async {
     await _storage.write(key: _tokenKey, value: token);
@@ -67,5 +68,15 @@ class TokenStorage {
     await _storage.delete(key: _tokenKey);
     await _storage.delete(key: _userKey);
     await _storage.delete(key: _phoneNumberKey);
+    await _storage.delete(key: _onboardingCompletedKey);
+  }
+
+  static Future<void> setOnboardingCompleted() async {
+    await _storage.write(key: _onboardingCompletedKey, value: 'true');
+  }
+
+  static Future<bool> isOnboardingCompleted() async {
+    final completed = await _storage.read(key: _onboardingCompletedKey);
+    return completed == 'true';
   }
 } 

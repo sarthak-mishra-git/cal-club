@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/auth/auth_response_model.dart';
 import '../utils/network_logger.dart';
+import '../network/api_client.dart';
 
 class AuthRepository {
-  static const String _baseUrl = 'https://cal-club.onrender.com';
+  static const String _baseUrl = 'https://calclub.onrender.com';
 
   Future<AuthResponse> requestOtp(String phoneNumber) async {
     final url = Uri.parse('$_baseUrl/auth/request-otp');
@@ -122,6 +123,11 @@ class AuthRepository {
       );
 
       NetworkLogger.logResponse('DELETE', url.toString(), response.statusCode, response.body);
+
+      if (ApiClient.isUnauthorizedError(response.statusCode)) {
+        await ApiClient.handleUnauthorizedError();
+        throw Exception('Unauthorized: Token expired or invalid');
+      }
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);

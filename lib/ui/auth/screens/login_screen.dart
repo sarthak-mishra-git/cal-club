@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../blocs/auth/auth_bloc.dart';
 import '../../../blocs/auth/auth_event.dart';
 import '../../../blocs/auth/auth_state.dart';
+import '../../../constants.dart';
 import 'otp_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -30,6 +32,26 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _enterAsGuest() {
+    context.read<AuthBloc>().add(EnterAsGuest());
+  }
+
+  Future<void> _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Could not open link'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,6 +66,11 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             );
           } else if (state is Authenticated) {
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/dashboard',
+              (route) => false,
+            );
+          } else if (state is GuestAuthenticated) {
             Navigator.of(context).pushNamedAndRemoveUntil(
               '/dashboard',
               (route) => false,
@@ -68,17 +95,46 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Form(
                     key: _formKey,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.start,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        // Enter as Guest Button
+                        SizedBox(
+                            height: 56,
+                            child: GestureDetector(
+                              onTap: _isLoading ? null : _enterAsGuest,
+                              child: Container(
+                                alignment: Alignment.centerRight,
+                                child: _isLoading
+                                    ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                                  ),
+                                )
+                                    : const Text(
+                                  'Skip login',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    // decoration: TextDecoration.underline,
+                                    color: Colors.blueGrey, // Dark beige
+                                  ),
+                                ),
+                              ),
+
+                            )
+                        ),
                         // App Logo/Icon
-                        Icon(
+                        const Icon(
                           Icons.restaurant_menu,
                           size: 80,
-                          color: const Color(0xFF8B7355), // Dark beige
+                          color: Colors.black, // Dark beige
                         ),
                         const SizedBox(height: 24),
-                        
+
                         // App Title
                         Text(
                           'Cal Club',
@@ -90,10 +146,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 8),
-                        
+
                         // Subtitle
                         Text(
-                          'Track your calories with AI',
+                          'Calorie tracking made easy',
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.grey[600],
@@ -101,12 +157,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 48),
-                        
-                                                  // Phone Input
+                        // Phone Input
                           TextFormField(
                             controller: _phoneController,
                             keyboardType: TextInputType.phone,
                             decoration: InputDecoration(
+                              prefix: const Text('+91  '),
                               labelText: 'Phone Number',
                               hintText: 'Enter your phone number',
                               prefixIcon: const Icon(Icons.phone),
@@ -119,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: const Color(0xFF8B7355)), // Dark beige
+                                borderSide: BorderSide(color: Colors.black), // Dark beige
                               ),
                             ),
                             validator: (value) {
@@ -133,14 +189,14 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                           ),
                         const SizedBox(height: 24),
-                        
+
                         // Send OTP Button
                         SizedBox(
                           height: 56,
                           child: ElevatedButton(
                             onPressed: _isLoading ? null : _sendOtp,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF8B7355), // Dark beige
+                              backgroundColor: Colors.black, // Dark beige
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -165,16 +221,49 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 24),
-                        
+                        const SizedBox(height: 16),
+
+                        // const SizedBox(height: 24),
+
                         // Terms and Privacy
-                        Text(
-                          'By continuing, you agree to our Terms of Service and Privacy Policy',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.grey[500],
-                          ),
+                        RichText(
                           textAlign: TextAlign.center,
+                          text: TextSpan(
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey[500],
+                            ),
+                            children: [
+                              const TextSpan(text: 'By continuing, you agree to our '),
+                              WidgetSpan(
+                                child: GestureDetector(
+                                  onTap: () => _launchUrl(kTermsOfServiceUrl),
+                                  child: Text(
+                                    'Terms of Service',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const TextSpan(text: ' and '),
+                              WidgetSpan(
+                                child: GestureDetector(
+                                  onTap: () => _launchUrl(kPrivacyPolicyUrl),
+                                  child: Text(
+                                    'Privacy Policy',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.black,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),

@@ -15,3 +15,16 @@ class FetchDashboardData extends DashboardEvent {
   @override
   List<Object?> get props => [date];
 }
+
+class FetchHealthData extends DashboardEvent {
+  final String? date;
+  
+  const FetchHealthData({this.date});
+  
+  @override
+  List<Object?> get props => [date];
+}
+
+class ConnectToAppleHealth extends DashboardEvent {
+  const ConnectToAppleHealth();
+}

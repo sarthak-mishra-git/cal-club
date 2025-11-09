@@ -29,7 +29,8 @@ class _FooterWidgetState extends State<FooterWidget> {
     setState(() {
       _footerItems = _footerItems.map((item) {
         return FooterItemData(
-          active: item.action == action,
+          // active: item.action == action,
+          active: item.active,
           icon: item.icon,
           title: item.title,
           action: item.action,

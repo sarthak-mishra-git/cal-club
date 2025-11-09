@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../network/auth_repository.dart';
+import '../../network/onboarding_repository.dart';
 import '../../network/token_storage.dart';
 import '../../services/navigation_service.dart';
 import '../../models/auth/auth_response_model.dart';
@@ -8,15 +9,21 @@ import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository _repository;
+  final OnboardingRepository _onboardingRepository;
 
-  AuthBloc({AuthRepository? repository})
-      : _repository = repository ?? AuthRepository(),
+  AuthBloc({
+    AuthRepository? repository,
+    OnboardingRepository? onboardingRepository,
+  })  : _repository = repository ?? AuthRepository(),
+        _onboardingRepository = onboardingRepository ?? OnboardingRepository(),
         super(AuthInitial()) {
     on<CheckAuthStatus>(_onCheckAuthStatus);
     on<SendOtpRequested>(_onSendOtpRequested);
     on<VerifyOtpRequested>(_onVerifyOtpRequested);
     on<LogoutRequested>(_onLogoutRequested);
     on<DeleteAccountRequested>(_onDeleteAccountRequested);
+    on<EnterAsGuest>(_onEnterAsGuest);
+    on<ExitGuestMode>(_onExitGuestMode);
   }
 
   Future<void> _onCheckAuthStatus(
@@ -54,6 +61,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     
     try {
       final response = await _repository.requestOtp(event.phoneNumber);
+      // emit(OtpSent());
       if (response.success) {
         emit(OtpSent());
       } else {
@@ -93,6 +101,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         }
         
         emit(Authenticated(token: response.token!, user: user));
+        
+        // Check onboarding answers after successful login
+        try {
+          final existingAnswers = await _onboardingRepository.getExistingAnswers();
+          // If no answers exist, navigate to onboarding
+          if (existingAnswers.isEmpty) {
+            NavigationService.navigateToAndClear('/onboarding');
+          } else {
+            // If answers exist, navigate to dashboard
+            NavigationService.navigateToAndClear('/dashboard');
+          }
+        } catch (e) {
+          // If there's an error checking answers, assume no answers and go to onboarding
+          print('Error checking onboarding answers: $e');
+          NavigationService.navigateToAndClear('/onboarding');
+        }
       } else {
         emit(AuthError(message: response.message ?? 'Invalid OTP'));
       }
@@ -144,5 +168,20 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     } catch (e) {
       emit(AuthError(message: 'Failed to delete account: $e'));
     }
+  }
+
+  Future<void> _onEnterAsGuest(
+    EnterAsGuest event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(GuestAuthenticated());
+  }
+
+  Future<void> _onExitGuestMode(
+    ExitGuestMode event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(Unauthenticated());
+    NavigationService.navigateToLogin();
   }
 } 

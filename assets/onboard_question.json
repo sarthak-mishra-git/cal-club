@@ -1,0 +1,367 @@
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "68c7373d2c1dee8ec36519c4",
+      "text": "Calorie tracking\nmade easy.",
+      "type": "NO_INPUT",
+      "options": [],
+      "sequence": 1,
+      "image": {
+        "url": "https://res.cloudinary.com/dfdvmcj2x/image/upload/v1761328755/onboard_intro_lltng0.png",
+        "paddingHorizontal": 0,
+        "paddingVertical": 20,
+        "height": 450
+      }
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519c4b",
+      "text": "Before we begin, what\nshould we call you?",
+      "type": "NAME_INPUT",
+      "options": [],
+      "sequence": 2
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519c5",
+      "text": "Hi, {name}! let's get to\nknow you first",
+      "type": "NO_INPUT",
+      "options": [],
+      "sequence": 3,
+      "image": {
+        "url": "https://res.cloudinary.com/dfdvmcj2x/image/upload/v1761331684/get_to_know_tjthih.png",
+        "paddingHorizontal": 0,
+        "paddingVertical": 0
+      }
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519c5b",
+      "text": "Choose your gender",
+      "subtext": "This will help us calibrate your custom plan",
+      "type": "SELECT",
+      "options": [
+        {
+          "text": "Male",
+          "icon": "male"
+        },
+        {
+          "text": "Female",
+          "icon": "female"
+        },
+        {
+          "text": "Other",
+          "icon": "other"
+        }
+      ],
+      "sequence": 4
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519c6",
+      "text": "How many workouts do\nyou do per week?",
+      "subtext": "How many workouts do you do per week?",
+      "type": "SELECT",
+      "options": [
+        {
+          "text": "0-2",
+          "subtext": "Workouts now and then"
+        },
+        {
+          "text": "3-5",
+          "subtext": "A few workouts per week"
+        },
+        {
+          "text": "6+",
+          "subtext": "Dedicated Athlete"
+        }
+      ],
+      "sequence": 5
+    },
+    {
+      "_id": "68c7373d2c1dee8ec365124rfd",
+      "text": "What's your typical day\nlike?",
+      "type": "SELECT",
+      "options": [
+        {
+          "text": "Sedentary (Desk Job)",
+          "subtext": "Less than 3k steps per day",
+          "icon": "desk_job"
+        },
+        {
+          "text": "Light (Occasional Activity)",
+          "subtext": "Between 3k - 7k steps daily",
+          "icon": "car"
+        },
+        {
+          "text": "Active (Regular Dxercise)",
+          "subtext": "Between 7k - 10k steps daily",
+          "icon": "shoe"
+        },
+        {
+          "text": "Very Active (Intense Activity)",
+          "subtext": "More than 10k steps per day",
+          "icon": "running"
+        },
+        {
+          "text": "Dynamic (Varied Movement)",
+          "subtext": "Varies daily, between 5k - 20k+",
+          "icon": "cycle"
+        }
+      ],
+      "sequence": 5
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519c7",
+      "text": "Where did you hear about us?",
+      "type": "SELECT",
+      "options": [
+        {
+          "text": "Instagram",
+          "icon": "instagram"
+        },
+        {
+          "text": "Youtube",
+          "icon": "youtube"
+        },
+        {
+          "text": "Facebook",
+          "icon": "facebook"
+        }
+      ],
+      "sequence": 6
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519ca",
+      "text": "What's your height and weight?",
+      "subtext": "We use this to calculate your BMI and calorie needs",
+      "type": "PICKER",
+      "options": [],
+      "sequence": 7
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519cc",
+      "text": "What's your date of birth?",
+      "subtext": "This helps us personalize your recommendations",
+      "type": "DATE",
+      "options": [],
+      "sequence": 8
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519cf",
+      "text": "Profile Summary",
+      "subtext": "Your BMR is the calories your body burns just to keep you alive. Its based on your height, weight, age and biological sex",
+      "type": "SUMMARY",
+      "options": [],
+      "sequence": 9
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519c8",
+      "text": "Have you tried other\ncalorie tracking apps?",
+      "type": "SELECT",
+      "options": [
+        {
+          "text": "No",
+          "icon": "thumbs_down"
+        },
+        {
+          "text": "Yes",
+          "icon": "thumbs_up"
+        }
+      ],
+      "sequence": 11
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519cd",
+      "text": "What is your goal?",
+      "subtext": "This helps us generate a plan for you",
+      "type": "SELECT",
+      "options": [
+        {
+          "text": "Lose Fat and Gain Muscle"
+        },
+        {
+          "text": "Lose Fat"
+        },
+        {
+          "text": "Gain Muscle"
+        },
+        {
+          "text": "Improve Lifestyle"
+        }
+      ],
+      "sequence": 12
+    },
+    {
+      "_id": "68c7373d2c1dee85556519c8",
+      "text": "Do you have a gym membership?",
+      "type": "SELECT",
+      "options": [
+        {
+          "text": "No",
+          "icon": "thumbs_down"
+        },
+        {
+          "text": "Yes",
+          "icon": "thumbs_up"
+        }
+      ],
+      "sequence": 13
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519ce",
+      "text": "What's your target weight (kg)?",
+      "subtext": "Set a realistic goal that you can achieve",
+      "type": "PICKER",
+      "options": [],
+      "sequence": 14
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519d2",
+      "text": "What is stopping you from\nreaching your goal?",
+      "type": "SELECT",
+      "options": [
+        {
+          "text": "Lack of consistency",
+          "icon": "bar_graph"
+        },
+        {
+          "text": "Unhealthy eating habits",
+          "icon": "burger"
+        },
+        {
+          "text": "Lack of support",
+          "icon": "hand_shake"
+        },
+        {
+          "text": "Busy schedule",
+          "icon": "calendar"
+        },
+        {
+          "text": "Lack of meal inspiration",
+          "icon": "light_bulb_slash"
+        }
+      ],
+      "sequence": 15
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519d3",
+      "text": "Do you follow a specific diet?",
+      "subtext": "This helps us generate a plan for you",
+      "type": "SELECT",
+      "options": [
+        {
+          "text": "Non-vegetarian",
+          "icon": "meat"
+        },
+        {
+          "text": "Vegetarian",
+          "icon": "vegetarian"
+        },
+        {
+          "text": "Vegan",
+          "icon": "vegan"
+        },
+        {
+          "text": "Eggitarian",
+          "icon": "eggitarian"
+        }
+      ],
+      "sequence": 16
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519d0",
+      "text": "How fast do you want\nto reach your goal?",
+      "type": "SLIDER",
+      "options": [],
+      "sequence": 17
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519d4",
+      "text": "What would you like to accomplish?",
+      "subtext": "Tell us about your biggest motivation",
+      "type": "SELECT",
+      "options": [
+        {
+          "text": "Eat and live healthier"
+        },
+        {
+          "text": "Boost my energy and mood"
+        },
+        {
+          "text": "Stay motivated and consistent"
+        },
+        {
+          "text": "Feel better about my body"
+        }
+      ],
+      "sequence": 18
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519db",
+      "text": "Enter Referral Code\n(Optional)",
+      "subtext": "You can skip this step",
+      "type": "REFERRAL_INPUT",
+      "options": [],
+      "sequence": 19
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519dc",
+      "text": "Time to generate your custom plan!",
+      "type": "NO_INPUT",
+      "options": [],
+      "sequence": 20,
+      "image": {
+        "url": "https://res.cloudinary.com/dfdvmcj2x/image/upload/v1761858003/Frame_1244828723_kaptvd.png",
+        "paddingHorizontal": 16,
+        "paddingVertical": 60,
+        "height": 300
+      }
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519cg",
+      "text": "Congratulations your custom plan is ready!",
+      "subtext": "Your macros on a balanced diet.",
+      "type": "PLAN_SUMMARY",
+      "options": [],
+      "planData": {
+        "goal": "Gain 5 kg by October 26",
+        "calories": 1500,
+        "protein": 30,
+        "fat": 31,
+        "carbs": 32
+      },
+      "sequence": 10
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519dd",
+      "text": "When do you usually have your meals?",
+      "subtext": "These reminders will keep you on track\n50% of the users form lose weight with cal club",
+      "type": "MEAL_TIMING",
+      "options": [
+        {
+          "text": "Morning:08:00"
+        },
+        {
+          "text": "Lunch:13:00"
+        },
+        {
+          "text": "Dinner:19:00"
+        }
+      ],
+      "sequence": 21
+    },
+    {
+      "_id": "68c7373d2c1dee8ec36519ee",
+      "text": "Let us help you hit your goals",
+      "subtext": "These reminders will keep you on track\n50% of the users form lose weight with cal club",
+      "type": "NOTIFICATION_PERMISSION",
+      "image": {
+        "url": "https://res.cloudinary.com/dfdvmcj2x/image/upload/v1761868704/Frame_1244828808_pzyt0o.png",
+        "paddingHorizontal": 16,
+        "paddingVertical": 16,
+        "height": 300
+      },
+      "options": [],
+      "sequence": 22
+    }
+  ],
+  "count": 22
+}

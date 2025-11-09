@@ -16,3 +16,7 @@ const String kLabelGoal = 'Goal';
 const String kLabelSteps = 'Steps';
 const String kLabelExercise = 'Exercise';
 const String kLabelFood = 'Food';
+
+// Legal URLs
+const String kPrivacyPolicyUrl = 'https://docs.google.com/document/d/1vMNZFXL72WmHYr1gqaiQkdmylIdS_7JaloBhQ3JINC0/edit?usp=sharing';
+const String kTermsOfServiceUrl = 'https://docs.google.com/document/d/1ZiEeWPyMOGkJuqL3DaUuxsNpcQdyK82sD2gfjce8vMk/edit?usp=sharing';

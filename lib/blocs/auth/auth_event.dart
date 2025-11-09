@@ -40,4 +40,8 @@ class DeleteAccountRequested extends AuthEvent {
 
   @override
   List<Object?> get props => [phoneNumber];
-} 
+}
+
+class EnterAsGuest extends AuthEvent {}
+
+class ExitGuestMode extends AuthEvent {} 

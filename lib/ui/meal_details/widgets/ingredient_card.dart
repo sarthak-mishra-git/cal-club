@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../models/meal_details/meal_details_model.dart';
 
 class IngredientCard extends StatefulWidget {
@@ -45,12 +46,13 @@ class _IngredientCardState extends State<IngredientCard> {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      color: const Color(0xFFFFFAF0), // Light beige
+      color: Colors.white, // Light beige
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Ingredient details
                 Expanded(
@@ -61,8 +63,8 @@ class _IngredientCardState extends State<IngredientCard> {
                         // Editable name field
                         TextField(
                           controller: _nameController,
-                          style: const TextStyle(
-                            fontSize: 20,
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
                           ),
@@ -70,7 +72,13 @@ class _IngredientCardState extends State<IngredientCard> {
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            border: OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(6)),
+                              borderSide: BorderSide(
+                                  color: Colors.grey,
+                                  width: 0.5
+                              ),
+                            ),
                             isDense: true,
                           ),
                           onChanged: (newName) {
@@ -88,8 +96,8 @@ class _IngredientCardState extends State<IngredientCard> {
                         // Static name display
                         Text(
                           widget.ingredient.name,
-                          style: const TextStyle(
-                            fontSize: 20,
+                          style: GoogleFonts.poppins(
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
                           ),
@@ -112,14 +120,20 @@ class _IngredientCardState extends State<IngredientCard> {
                           controller: _quantityController,
                           keyboardType: TextInputType.number,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87),
-                          decoration: InputDecoration(
+                          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500, color: Colors.black87),
+                          decoration: const InputDecoration(
                             filled: true,
                             fillColor: Colors.white,
                             contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            border: const OutlineInputBorder(),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.all(Radius.circular(6)),
+                              borderSide: BorderSide(
+                                color: Colors.grey,
+                                width: 0.5
+                              ),
+                            ),
                             isDense: true,
-                            suffixText: widget.ingredient.unit,
+                            // suffixText: widget.ingredient.unit,
                           ),
                           onChanged: (newQuantity) {
                             // Auto-save quantity changes to pendingChanges
@@ -139,19 +153,30 @@ class _IngredientCardState extends State<IngredientCard> {
                     ] else ...[
                       // Static quantity display
                       Text(
-                        '${widget.ingredient.quantity} ${widget.ingredient.unit}',
-                        style: const TextStyle(
+                        '${widget.ingredient.quantity}',
+                        style: GoogleFonts.poppins(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black87,
                         ),
+                        textAlign: TextAlign.right,
                       ),
                     ],
+                    Text(
+                      '${widget.ingredient.unit}',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.right,
+                    ),
+
                   ],
                 ),
               ],
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               // decoration: BoxDecoration(
@@ -169,7 +194,7 @@ class _IngredientCardState extends State<IngredientCard> {
                   const SizedBox(width: 2),
                   Text(
                     '${widget.ingredient.calories.toStringAsFixed(1)} kcal',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                       color: Colors.grey[800],
@@ -198,7 +223,7 @@ class _IngredientCardState extends State<IngredientCard> {
                       const SizedBox(width: 2),
                       Text(
                         '${widget.ingredient.protein.toStringAsFixed(1)} g',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[800],
@@ -224,7 +249,7 @@ class _IngredientCardState extends State<IngredientCard> {
                       const SizedBox(width: 2),
                       Text(
                         '${widget.ingredient.carbs.toStringAsFixed(1)} g',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[800],
@@ -250,7 +275,7 @@ class _IngredientCardState extends State<IngredientCard> {
                       const SizedBox(width: 2),
                       Text(
                         '${widget.ingredient.fat.toStringAsFixed(1)} g',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
                           color: Colors.grey[800],
@@ -261,7 +286,7 @@ class _IngredientCardState extends State<IngredientCard> {
                 ),
                 // Text(
                 //   '${widget.ingredient.calories.toStringAsFixed(1)} cal',
-                //   style: TextStyle(
+                //   style: GoogleFonts.poppins(
                 //     fontSize: 12,
                 //     color: Colors.grey[600],
                 //   ),
@@ -269,7 +294,7 @@ class _IngredientCardState extends State<IngredientCard> {
                 // const SizedBox(width: 8),
                 // Text(
                 //   '${widget.ingredient.protein.toStringAsFixed(1)}g protein',
-                //   style: TextStyle(
+                //   style: GoogleFonts.poppins(
                 //     fontSize: 12,
                 //     color: Colors.grey[600],
                 //   ),

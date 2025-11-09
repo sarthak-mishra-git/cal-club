@@ -1,0 +1,41 @@
+{
+    "success": true,
+    "message": "Progress data fetched successfully",
+    "data": {
+        "header": "Lose weight",
+        "weightProgress": {
+            "startWeight": 85,
+            "currentWeight": 78.5,
+            "targetWeight": 65,
+            "weightChangePerWeek": -0.4
+        },
+        "dailyGoal": {
+            "calorie": 1800,
+            "protein": 150,
+            "carbs": 200,
+            "fats": 60
+        },
+        "lastCheckedIn": "Oct 15, 2025",
+        "nextCheckIn": "Nov 07, 2025",
+        "footerData": [
+            {
+                "active": false,
+                "icon": "home",
+                "title": "Home",
+                "action": "navigate_home"
+            },
+            {
+                "active": true,
+                "icon": "progress",
+                "title": "Progress",
+                "action": "navigate_progress"
+            },
+            {
+                "active": false,
+                "icon": "settings",
+                "title": "Settings",
+                "action": "navigate_settings"
+            }
+        ]
+    }
+}

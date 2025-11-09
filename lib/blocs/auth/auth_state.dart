@@ -51,4 +51,6 @@ class AccountDeleted extends AuthState {
 
   @override
   List<Object?> get props => [message];
-} 
+}
+
+class GuestAuthenticated extends AuthState {} 
