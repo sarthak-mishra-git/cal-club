@@ -350,64 +350,50 @@ class _DashboardScreenState extends State<DashboardScreen> {
           }
         },
         child: Scaffold(
-          // backgroundColor: Colors.black,
-            body: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF000000),
-                    Color(0xFF222222),
-                    Color(0xFF777777),
-                  ],
-                  stops: [0.0, 0.2349, 0.7728],
-                ),
-              ),
-              child: BlocBuilder<AuthBloc, AuthState>(
-            builder: (context, authState) {
-              // Check if user is in guest mode and use mock data
-              if (authState is GuestAuthenticated) {
-                final mockData = MockDataService.getGuestDashboardData(date: _selectedDate);
-                return _buildDashboardContent(
-                  mockData.appBarData,
-                  mockData.weekViewData,
-                  mockData.daySelectorData,
-                  mockData.widgets,
-                  mockData.footerData,
-                  mockData.showFloatingActionButton,
-                  null, // No health data for guest mode
-                );
-              }
-
-              // For authenticated users, use the normal dashboard bloc
-              return BlocBuilder<DashboardBloc, DashboardState>(
-                builder: (context, state) {
-                  if (state is DashboardLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  } else if (state is DashboardLoaded) {
-                    return _buildDashboardContent(
-                      state.appBarData,
-                      state.weekViewData,
-                      state.daySelectorData,
-                      state.widgets,
-                      state.footerData,
-                      state.showFloatingActionButton,
-                      state.healthData != null ? {
-                        'totalCalories': state.healthData!.totalCalories,
-                        'activeCalories': state.healthData!.activeCalories,
-                        'basalCalories': state.healthData!.basalCalories,
-                      } : null,
-                    );
-                  } else if (state is DashboardError) {
-                    return Center(child: Text(state.message));
-                  }
-                  return const SizedBox.shrink();
-                },
+          backgroundColor: Colors.black,
+            body: BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, authState) {
+            // Check if user is in guest mode and use mock data
+            if (authState is GuestAuthenticated) {
+              final mockData = MockDataService.getGuestDashboardData(date: _selectedDate);
+              return _buildDashboardContent(
+                mockData.appBarData,
+                mockData.weekViewData,
+                mockData.daySelectorData,
+                mockData.widgets,
+                mockData.footerData,
+                mockData.showFloatingActionButton,
+                null, // No health data for guest mode
               );
-            },
-          ),
-        )
+            }
+
+            // For authenticated users, use the normal dashboard bloc
+            return BlocBuilder<DashboardBloc, DashboardState>(
+              builder: (context, state) {
+                if (state is DashboardLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state is DashboardLoaded) {
+                  return _buildDashboardContent(
+                    state.appBarData,
+                    state.weekViewData,
+                    state.daySelectorData,
+                    state.widgets,
+                    state.footerData,
+                    state.showFloatingActionButton,
+                    state.healthData != null ? {
+                      'totalCalories': state.healthData!.totalCalories,
+                      'activeCalories': state.healthData!.activeCalories,
+                      'basalCalories': state.healthData!.basalCalories,
+                    } : null,
+                  );
+                } else if (state is DashboardError) {
+                  return Center(child: Text(state.message));
+                }
+                return const SizedBox.shrink();
+              },
+            );
+                        },
+                      )
         ),
       ),
     );
@@ -432,10 +418,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
               onStreakTap: _handleStreakTap,
               onProfileTap: () => _showProfileSidebar(context),
             ),
-            WeekViewWidget(
-              weekViewData: weekViewData,
-              onDayTap: _handleDayTap,
-            ),
+            // WeekViewWidget(
+            //   weekViewData: weekViewData,
+            //   onDayTap: _handleDayTap,
+            // ),
             DaySelectorWidget(
               daySelectorData: daySelectorData,
               onPrevTap: _handlePrevDay,
