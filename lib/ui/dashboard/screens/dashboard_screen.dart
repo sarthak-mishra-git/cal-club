@@ -210,24 +210,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return;
     }
 
-    // Check camera permission before navigating to camera screen
-    final hasPermission = await CameraScreen.hasCameraPermission();
-    if (!hasPermission) {
-      final granted = await CameraScreen.requestCameraPermission();
-      if (!granted) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Camera permission is required to take photos'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-        return;
-      }
-    }
-
-    // Navigate to camera screen
+    // Navigate to camera screen - it will handle permission request
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const CameraScreen(),
@@ -263,7 +246,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
       },
     );
   }
-
 
   Future<void> _processImageResult(Map<String, dynamic> result) async {
     try {

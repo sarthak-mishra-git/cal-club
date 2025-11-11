@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:io';
 import 'package:camera/camera.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'image_confirmation_screen.dart';
 
 class CameraScreen extends StatefulWidget {
@@ -11,26 +12,6 @@ class CameraScreen extends StatefulWidget {
 
   @override
   State<CameraScreen> createState() => _CameraScreenState();
-
-  /// Check if camera permission is available before opening camera
-  static Future<bool> hasCameraPermission() async {
-    try {
-      final status = await Permission.camera.status;
-      return status.isGranted;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  /// Request camera permission and return the result
-  static Future<bool> requestCameraPermission() async {
-    try {
-      final status = await Permission.camera.request();
-      return status.isGranted;
-    } catch (e) {
-      return false;
-    }
-  }
 }
 
 class _CameraScreenState extends State<CameraScreen> {
@@ -40,36 +21,52 @@ class _CameraScreenState extends State<CameraScreen> {
   bool _isCapturing = false;
   bool _isInitializing = true;
   String? _initializationError;
-  PermissionStatus? _permissionStatus;
 
   @override
   void initState() {
     super.initState();
-    _initializeCamera();
+    _requestPermissionAndInitialize();
   }
 
-  Future<void> _initializeCamera() async {
+  Future<void> _requestPermissionAndInitialize() async {
     try {
       setState(() {
         _isInitializing = true;
         _initializationError = null;
       });
 
-      // Check current permission status - should already be granted from dashboard
+      // Request camera permission explicitly
       var status = await Permission.camera.status;
-      _permissionStatus = status;
       
-      // If permission is not granted, show error and exit
+      // Request permission if not granted
       if (!status.isGranted) {
-        await _handlePermissionError();
-        return;
+        status = await Permission.camera.request();
       }
-
-      // Initialize camera with better error handling
-      await _setupCamera();
+      
+      // If permission granted, initialize camera
+      if (status.isGranted) {
+        await _setupCamera();
+      } else {
+        // Permission denied, exit camera screen silently
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      }
       
     } catch (e) {
-      await _handleInitializationError(e);
+      // Check if error is due to permission denial
+      final errorString = e.toString().toLowerCase();
+      if (errorString.contains('permission') || 
+          errorString.contains('denied') ||
+          errorString.contains('not authorized') ||
+          errorString.contains('camera access')) {
+        // Permission was denied, exit camera screen
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+      } else {
+        await _handleInitializationError(e);
+      }
     } finally {
       if (mounted) {
         setState(() {
@@ -79,58 +76,24 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
-  Future<void> _handlePermissionError() async {
-    if (!mounted) return;
-    
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Camera Permission Required'),
-          content: const Text(
-            'Camera access is required to use this feature. Please grant camera permission in your device settings.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop(); // Exit camera screen
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                openAppSettings();
-              },
-              child: const Text('Open Settings'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Future<void> _setupCamera() async {
     try {
       _cameras = await availableCameras();
       
-      // iOS Simulator workaround: If no cameras available, show simulator message
-      if (_cameras == null || _cameras!.isEmpty) {
-        if (defaultTargetPlatform == TargetPlatform.iOS && kDebugMode) {
-          print('🔧 iOS Simulator: No cameras available, showing simulator message...');
-          if (mounted) {
-            setState(() {
-              _isInitialized = true;
-              _initializationError = null;
-            });
-          }
-          return; // Skip camera controller setup
-        } else {
-          throw Exception('No cameras available on this device');
-        }
-      }
+      // // iOS Simulator workaround: If no cameras available, show simulator message
+      // if (_cameras == null || _cameras!.isEmpty) {
+      //   if (defaultTargetPlatform == TargetPlatform.iOS && kDebugMode) {
+      //     if (mounted) {
+      //       setState(() {
+      //         _isInitialized = true;
+      //         _initializationError = null;
+      //       });
+      //     }
+      //     return; // Skip camera controller setup
+      //   } else {
+      //     throw Exception('No cameras available on this device');
+      //   }
+      // }
 
       // Try to find the best camera (prefer back camera)
       CameraDescription? selectedCamera;
@@ -181,7 +144,7 @@ class _CameraScreenState extends State<CameraScreen> {
           label: 'Retry',
           textColor: Colors.white,
           onPressed: () {
-            _initializeCamera();
+            _requestPermissionAndInitialize();
           },
         ),
       ),
@@ -192,10 +155,6 @@ class _CameraScreenState extends State<CameraScreen> {
     if (mounted) {
       Navigator.of(context).pop();
     }
-  }
-
-  String _getLoadingMessage() {
-    return 'Initializing camera...';
   }
 
   Future<void> _takePicture() async {
@@ -266,13 +225,9 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
-
   Future<void> _selectFromGallery() async {
     try {
       // Use image_picker for gallery - it handles permissions automatically
-      // On Android 13+, it uses photos permission
-      // On older Android, it uses storage permission
-      // On iOS, it uses photos permission
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(
         source: ImageSource.gallery,
@@ -335,9 +290,9 @@ class _CameraScreenState extends State<CameraScreen> {
                 color: Colors.white,
               ),
               const SizedBox(height: 16),
-              Text(
-                _getLoadingMessage(),
-                style: const TextStyle(
+              const Text(
+                'Initializing camera...',
+                style: TextStyle(
                   color: Colors.white,
                   fontSize: 16,
                 ),
@@ -389,7 +344,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       _initializationError = null;
                       _isInitializing = true;
                     });
-                    _initializeCamera();
+                    _requestPermissionAndInitialize();
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
@@ -438,53 +393,53 @@ class _CameraScreenState extends State<CameraScreen> {
     }
 
     // Show iOS Simulator message if no cameras available
-    if (_cameras == null || _cameras!.isEmpty) {
-      return Scaffold(
-        backgroundColor: Colors.black,
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(
-                  Icons.camera_alt_outlined,
-                  color: Colors.white,
-                  size: 64,
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  'iOS Simulator',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Camera functionality is not available in iOS Simulator.\n\nTo test camera features, please use a real iOS device.',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 16,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                  ),
-                  child: const Text('Go Back'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      );
-    }
+    // if (_cameras == null || _cameras!.isEmpty) {
+    //   return Scaffold(
+    //     backgroundColor: Colors.black,
+    //     body: Center(
+    //       child: Padding(
+    //         padding: const EdgeInsets.all(24),
+    //         child: Column(
+    //           mainAxisAlignment: MainAxisAlignment.center,
+    //           children: [
+    //             const Icon(
+    //               Icons.camera_alt_outlined,
+    //               color: Colors.white,
+    //               size: 64,
+    //             ),
+    //             const SizedBox(height: 16),
+    //             const Text(
+    //               'iOS Simulator',
+    //               style: TextStyle(
+    //                 color: Colors.white,
+    //                 fontSize: 24,
+    //                 fontWeight: FontWeight.bold,
+    //               ),
+    //             ),
+    //             const SizedBox(height: 8),
+    //             const Text(
+    //               'Camera functionality is not available in iOS Simulator.\n\nTo test camera features, please use a real iOS device.',
+    //               style: TextStyle(
+    //                 color: Colors.white70,
+    //                 fontSize: 16,
+    //               ),
+    //               textAlign: TextAlign.center,
+    //             ),
+    //             const SizedBox(height: 24),
+    //             ElevatedButton(
+    //               onPressed: () => Navigator.of(context).pop(),
+    //               style: ElevatedButton.styleFrom(
+    //                 backgroundColor: Colors.white,
+    //                 foregroundColor: Colors.black,
+    //               ),
+    //               child: const Text('Go Back'),
+    //             ),
+    //           ],
+    //         ),
+    //       ),
+    //     ),
+    //   );
+    // }
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -621,32 +576,6 @@ class _CameraScreenState extends State<CameraScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Depth perception indicator
-                // Container(
-                //   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                //   decoration: BoxDecoration(
-                //     color: Colors.black.withOpacity(0.7),
-                //     borderRadius: BorderRadius.circular(20),
-                //   ),
-                //   child: const Row(
-                //     mainAxisSize: MainAxisSize.min,
-                //     children: [
-                //       Icon(
-                //         Icons.visibility,
-                //         color: Colors.white,
-                //         size: 16,
-                //       ),
-                //       SizedBox(width: 4),
-                //       Text(
-                //         'Depth Sensing Active',
-                //         style: TextStyle(
-                //           color: Colors.white,
-                //           fontSize: 12,
-                //         ),
-                //       ),
-                //     ],
-                //   ),
-                // ),
                 const SizedBox(height: 8),
                 // Camera resolution indicator
                 Container(
@@ -701,4 +630,4 @@ class _CameraScreenState extends State<CameraScreen> {
       ),
     );
   }
-} 
+}
